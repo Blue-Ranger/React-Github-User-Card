@@ -1,8 +1,7 @@
 import React from "react";
 import axios from "axios";
 import UserCard from "./Components/UserCard";
-import FollowersCard from "./Components/FollowersCard";
-import logo from "./logo.svg";
+import FollowerCard from "./Components/FollowerCard";
 import "./App.css";
 
 class App extends React.Component {
@@ -17,21 +16,33 @@ class App extends React.Component {
   componentDidMount() {
     axios
       .get("https://api.github.com/users/Blue-Ranger")
-      .then((res) => {
+      .then((response) => {
         this.setState({
-          users: [users.data],
-        }).catch((error) => {
-          console.log(error);
+          users: [response.data],
         });
+
+        const data = response.data;
+        return data;
       })
 
-      .get("https://api.github.com/users/Blue-Ranger")
-      .then((res) => {
-        this.setState({
-          followers: [followers.data],
-        }).catch((error) => {
-          console.log(error);
-        });
+      .then((response) => {
+        console.log(response);
+        axios
+          .get(`${response.followers_url}`)
+          .then((response) => {
+            console.log(response.data);
+            this.setState({
+              followers: [...response.data],
+            });
+          })
+
+          .catch((error) => {
+            console.log("error follower msg", error);
+          });
+      })
+
+      .catch((error) => {
+        console.log("error msg", error);
       });
   }
   render() {
@@ -43,7 +54,8 @@ class App extends React.Component {
         </div>
 
         <div className="something followers">
-          <FollowersCard followers={this.state.followers} />
+          <h1>Followers</h1>
+          <FollowerCard followers={this.state.followers} />
         </div>
       </div>
     );
